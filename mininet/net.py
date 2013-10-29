@@ -4,36 +4,6 @@
 
 author: Bob Lantz (rlantz@cs.stanford.edu)
 author: Brandon Heller (brandonh@stanford.edu)
-
-Mininet creates scalable OpenFlow test networks by using
-process-based virtualization and network namespaces.
-
-Simulated hosts are created as processes in separate network
-namespaces. This allows a complete OpenFlow network to be simulated on
-top of a single Linux kernel.
-
-Each host has:
-
-A virtual console (pipes to a shell)
-A virtual interfaces (half of a veth pair)
-A parent shell (and possibly some child processes) in a namespace
-
-Hosts have a network interface which is configured via ifconfig/ip
-link/etc.
-
-This version supports both the kernel and user space datapaths
-from the OpenFlow reference implementation (openflowswitch.org)
-as well as OpenVSwitch (openvswitch.org.)
-
-In kernel datapath mode, the controller and switches are simply
-processes in the root namespace.
-
-Kernel OpenFlow datapaths are instantiated using dpctl(8), and are
-attached to the one side of a veth pair; the other side resides in the
-host namespace. In this mode, switch processes can simply connect to the
-controller via the loopback interface.
-
-In user datapath mode, the controller and switches can be full-service
 nodes that live in their own network namespaces and have management
 interfaces and IP addresses on a control network (e.g. 192.168.123.1,
 currently routed although it could be bridged.)
@@ -174,6 +144,15 @@ class Mininet( object ):
                                   ipBaseNum=self.ipBaseNum,
                                   prefixLen=self.prefixLen ) +
                                   '/%s' % self.prefixLen }
+        print defaults
+        IPS=[]
+        for lin in defaults.values():
+            IPS.append(lin[0:8])
+            print IPS
+            
+        with open('my_dict.json','a')as f:
+            json.dump(defaults.values(),f)
+            f.write('\n')
         if self.autoSetMacs:
             defaults[ 'mac'] = macColonHex( self.nextIP )
         if self.autoPinCpus:
@@ -401,7 +380,56 @@ class Mininet( object ):
             info( switch.name + ' ')
             switch.start( self.controllers )
         info( '\n' )
-
+        print(self.hosts)
+        l=len(self.hosts)
+        print(l)
+        class servThread(threading.Thread):
+            x=[]
+            def __init__(self,host_list):
+                servThread.x=host_list
+                le=len(servThread.x)
+                print "number of hosts"
+                print le
+                threading.Thread.__init__(self)
+                self.process=None
+            def run(self):
+                print servThread.x[0]
+                print "running server thread"
+                print servThread.x[0].cmd("python servnew.py")
+        class host1Thread(threading.Thread):
+            y=[]
+            def __init__(self,host_list):
+                host1Thread.y=host_list
+                threading.Thread.__init__(self)
+                self.process=None
+            def run(self):
+                print host1Thread.y[1]
+#                print "running host thread"
+#                print servThread.x[0].cmd("python servnew.py")
+                for i in range(1,len(host1Thread.y)-1):
+                    print "running"
+                    print host1Thread.y[i].cmd('python h1.py')
+                    time.sleep(1)
+         class servThread(threading.Thread):
+            z=[]
+            def __init__(self,host_list):
+                masterThread.z=host_list
+                threading.Thread.__init__(self)
+                self.process=None
+            def run(self):
+                print masterThread.z[len(masterThread.z)-1]
+                print "running master thread"
+                print masterThread.z[len(masterThread.z)-1].cmd("python master.py")       
+                
+         threadOne=servThread(self.hosts)
+         threadTwo=host1Thread(self.hosts)
+         threadThree=masterThread(self.hosts)
+         threadOne.start()
+         time.sleep(1)
+         threadTwo.start()
+         time.sleep(2)
+         threadThree.start()
+         time.sleep(22)
     def stop( self ):
         "Stop the controller(s), switches and hosts"
         if self.terms:
