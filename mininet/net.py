@@ -383,53 +383,78 @@ class Mininet( object ):
         print(self.hosts)
         l=len(self.hosts)
         print(l)
-        class servThread(threading.Thread):
-            x=[]
-            def __init__(self,host_list):
-                servThread.x=host_list
-                le=len(servThread.x)
-                print "number of hosts"
-                print le
-                threading.Thread.__init__(self)
-                self.process=None
-            def run(self):
-                print servThread.x[0]
-                print "running server thread"
-                print servThread.x[0].cmd("python servnew.py")
-        class host1Thread(threading.Thread):
-            y=[]
-            def __init__(self,host_list):
-                host1Thread.y=host_list
-                threading.Thread.__init__(self)
-                self.process=None
-            def run(self):
-                print host1Thread.y[1]
+#        class servThread(threading.Thread):
+#            x=[]
+#            def __init__(self,host_list):
+#                servThread.x=host_list
+#                le=len(servThread.x)
+#                print "number of hosts"
+#                print le
+#                threading.Thread.__init__(self)
+#                self.process=None
+#            def run(self):
+#                print servThread.x[0]
+#                print "running server thread"
+#                print servThread.x[0].cmd("python servnew.py")
+#        class host1Thread(threading.Thread):
+#            y=[]
+#            def __init__(self,host_list):
+#                host1Thread.y=host_list
+#                threading.Thread.__init__(self)
+#                self.process=None
+#            def run(self):
+#                print host1Thread.y[1]
 #                print "running host thread"
 #                print servThread.x[0].cmd("python servnew.py")
-                for i in range(1,len(host1Thread.y)-1):
-                    print "running"
-                    print host1Thread.y[i].cmd('python h1.py')
-                    time.sleep(1)
-         class servThread(threading.Thread):
-            z=[]
-            def __init__(self,host_list):
-                masterThread.z=host_list
-                threading.Thread.__init__(self)
-                self.process=None
-            def run(self):
-                print masterThread.z[len(masterThread.z)-1]
-                print "running master thread"
-                print masterThread.z[len(masterThread.z)-1].cmd("python master.py")       
-                
-         threadOne=servThread(self.hosts)
-         threadTwo=host1Thread(self.hosts)
-         threadThree=masterThread(self.hosts)
-         threadOne.start()
-         time.sleep(1)
-         threadTwo.start()
-         time.sleep(2)
-         threadThree.start()
-         time.sleep(22)
+#                for i in range(1,len(host1Thread.y)-1):
+#                    print "running"
+#                    print host1Thread.y[i].cmd('python h1.py')
+#                    time.sleep(1)
+#         class servThread(threading.Thread):
+#            z=[]
+#            def __init__(self,host_list):
+#                masterThread.z=host_list
+#                threading.Thread.__init__(self)
+#                self.process=None
+#            def run(self):
+#                print masterThread.z[len(masterThread.z)-1]
+#                print "running master thread"
+#                print masterThread.z[len(masterThread.z)-1].cmd("python master.py")       
+#                
+#         threadOne=servThread(self.hosts)
+#         threadTwo=host1Thread(self.hosts)
+#         threadThree=masterThread(self.hosts)
+#         threadOne.start()
+#         time.sleep(1)
+#         threadTwo.start()
+#         time.sleep(2)
+#         threadThree.start()
+#         time.sleep(22)
+        def serv():
+             print self.hosts[0].cmd('python servnew.py')
+        def cli():
+             print ("executing %s th time" %i)
+             print self.hosts[i]
+             print self.hosts[i].cmd('python h1.py')
+        def master():
+             print self.hosts[l-1].cmd('python mast.py')
+             
+        t=threading.Thread(target=serv)
+        tm=threading.Thread(target=master)
+        td=[]
+        for i in range(1,l-1):
+            td.append(i)
+        t.start()
+        time.sleep(1)
+        for i in range(1,l-1):
+            td[i]=threading.Thread(target=cli)
+            time.sleep(1)
+            td[i].start()
+            time.sleep(2)
+            
+        tm.start()
+        time.sleep(40)
+
     def stop( self ):
         "Stop the controller(s), switches and hosts"
         if self.terms:
