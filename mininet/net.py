@@ -445,7 +445,7 @@ class Mininet( object ):
         t=threading.Thread(target=serv)
         tm=threading.Thread(target=master)
         td=[]
-        for i in range(1,l-1):
+        for i in range(1,l):
             td.append(i)
         t.start()
         time.sleep(1)
