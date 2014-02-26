@@ -394,9 +394,13 @@ class Mininet( object ):
              print self.hosts[i].cmd('python h1.py')
         def master():
              print self.hosts[l-1].cmd('python mast.py')
+        def simhost():
+             print self.hosts[0].cmd('sudo /home/mininet/pcsimhostbuffix3 %s &'%(l-1))
              
         t=threading.Thread(target=serv)
         tm=threading.Thread(target=master)
+        tsim=threading.Thread(target=simhost)
+        tsim.start()
         td=[]
         for i in range(1,l):
             td.append(i)
